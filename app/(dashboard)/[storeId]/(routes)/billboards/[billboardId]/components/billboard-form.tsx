@@ -52,29 +52,43 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
     });
 
     const onSubmit = async (data: BillboardFormValues) => {
-        try{
+        try {
             setLoading(true);
-            await axios.patch(`/api/stores/${params.storeId}/billboards/${params.billboardId}`, data);
+            
+            console.log("Params:", params); // Log params for debugging
+    
+            if (initialData) {
+                if (!params.billboardId) {
+                    toast.error("Billboard ID is missing.");
+                    return;
+                }
+                await axios.patch(`/api/${params.storeId}/billboards/${params.billboardId}`, data);
+            } else {
+                await axios.post(`/api/${params.storeId}/billboards`, data);
+            }
+    
             router.refresh();
-            toast.success(toastMessage)
+            router.push(`/${params.storeId}/billboards`);
+            toast.success(toastMessage);
         } catch (error) { 
-            console.error("Error deleting store:", error); 
-            toast.error("something went wrong.");
+            console.error("Error updating/creating billboard:", error); 
+            toast.error("Something went wrong.");
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
+
 
     const onDelete = async () => {
         try{
             setLoading(true)
-            await axios.delete(`/api/${params.storeId}/${params.billboardId}`)
+            await axios.delete(`/api/${params.storeId}/billboards/${params.billboardId}`)
             router.refresh();
             router.push("/")
             toast.success("Billboard deleted.")
         } catch (error) {
             console.error("Error deleting store:", error); 
-            toast.error("Make sure you removed all the products and categories first.");
+            toast.error("Make sure you removed all categories using billboard.");
         } finally {
             setLoading(false)
             setOpen(false)
