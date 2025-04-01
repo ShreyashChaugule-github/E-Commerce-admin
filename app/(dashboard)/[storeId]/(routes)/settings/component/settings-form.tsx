@@ -1,10 +1,13 @@
 "use client"
 
+import { AlertModal } from "@/components/modals/alert-modal"
+import { ApiAlert } from "@/components/ui/api-alert"
 import { Button } from "@/components/ui/button"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Heading } from "@/components/ui/heading"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
+import { useOrigin } from "@/hooks/use-origin"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Store } from "@prisma/client"
 import axios from "axios"
@@ -31,6 +34,7 @@ export const SettingsForm: React.FC<SettingsPageProps> = ({
 }) => {
     const params = useParams();
     const router = useRouter();
+    const origin = useOrigin();
 
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false);
@@ -47,14 +51,37 @@ export const SettingsForm: React.FC<SettingsPageProps> = ({
             router.refresh();
             toast.success("Store updated")
         } catch (error) {
+            console.error("Error updating store:", error); 
             toast.error("something went wrong.");
         } finally {
             setLoading(false)
         }
     };
 
+    const onDelete = async () => {
+        try{
+            setLoading(true)
+            await axios.delete(`/api/stores/${params.storeId}`)
+            router.refresh();
+            router.push("/")
+            toast.success("Store deleted.")
+        } catch (error) {
+            console.error("Error deleting store:", error); 
+            toast.error("Make sure you removed all the products and categories first.");
+        } finally {
+            setLoading(false)
+            setOpen(false)
+        }
+    }
+
     return (
         <>
+            <AlertModal 
+                isOpen={open}
+                onClose={() => setOpen(false)}
+                onConfirm={onDelete}
+                loading={loading}
+                />
             <div className="flex items-center justify-between">
                 <Heading 
                     title="Settings"
@@ -92,6 +119,8 @@ export const SettingsForm: React.FC<SettingsPageProps> = ({
                     </Button>
                 </form>
             </FormProvider>
+            <Separator />
+            <ApiAlert title="NEXT_PUBLIC_API_URL" description={`${origin}/api/${params.storeId}`} variant="public"/>
         </>
     )
 }
