@@ -69,7 +69,7 @@ export const ColorForm: React.FC<ColorFormProps> = ({
             }
     
             router.refresh();
-            router.push(`/${params.colorId}/colors`);
+            router.push(`/${params.storeId}/colors`);
             toast.success(toastMessage);
         } catch (error) { 
             console.error("Error updating/creating colors:", error); 
@@ -89,7 +89,7 @@ export const ColorForm: React.FC<ColorFormProps> = ({
             toast.success("color deleted.")
         } catch (error) {
             console.error("Error deleting store:", error); 
-            toast.error("Make sure you removed all product using this size first.");
+            toast.error("Make sure you removed all product using this color first.");
         } finally {
             setLoading(false)
             setOpen(false)
@@ -148,7 +148,7 @@ export const ColorForm: React.FC<ColorFormProps> = ({
                                         <Input disabled={loading} placeholder="Color value" {...field}/>
                                         <div 
                                             className="border p-4 rounded-full"
-                                            style={{background: field.value}}
+                                            style={{background: field.value || "#ccc"}}
                                         />
                                     </div>
                                 </FormControl>

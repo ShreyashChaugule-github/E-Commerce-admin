@@ -36,7 +36,7 @@ export const CellAction: React.FC<CellActionProps> = ({
             toast.success("colors deleted.")
         } catch (error) {
             console.error("Error deleting store:", error); 
-            toast.error("Make sure you removed all products using size.");
+            toast.error("Make sure you removed all products using color first.");
         } finally {
             setLoading(false)
             setOpen(false)
