@@ -4,16 +4,17 @@ import { NextResponse } from "next/server";
 
 export async function GET (
     req: Request,
-    { params }: { params: {  colorId: string }}
+    { params }: { params: Promise<{  colorId: string }>}
 ) {
     try{
-        if(!params.colorId) {
+        const { colorId } = await params;
+        if(!colorId) {
             return new NextResponse("Color id is required", { status: 400})
         }
 
         const color = await prismadb.color.findUnique({
             where: {
-                id: params.colorId,
+                id: colorId,
             }
         });
         return NextResponse.json(color);
@@ -25,7 +26,7 @@ export async function GET (
 
 export async function PATCH(
     req: Request,
-    { params }: { params: { storeId: string; colorId: string } }
+    { params }: { params: Promise<{ storeId: string; colorId: string }> }
   ) {
     try {
       const { userId } = await auth();
@@ -35,7 +36,7 @@ export async function PATCH(
       const { name, value } = body;
   
       // Await params if needed
-      const { storeId, colorId } = params;
+      const { storeId, colorId } = await params;
   
       if (!userId) {
         return new NextResponse("Unauthorized", { status: 401 });
@@ -73,7 +74,7 @@ export async function PATCH(
 
 export async function DELETE (
     req: Request,
-    context: { params: { storeId: string, colorId: string }}
+    context: { params: Promise<{ storeId: string, colorId: string }>}
 ) {
     try{
         const { userId } = await auth();
